@@ -1,0 +1,33 @@
+# Introduction
+
+## Dataset
+
+```{r}
+dataset_mbti = read.csv("datasets/MBTI.csv")
+dim(dataset_mbti)
+summary(dataset_mbti)
+```
+
+## Research questions
+
+# RQ-1: Postoji li veza izmedu tipa ličnosti i načina držanja?
+
+## Conclusion
+
+# RQ-2: Jesu li fizički aktivniji ljudi takoder i ekstrovertiraniji?
+
+## Conclusion
+
+# RQ-3: Postoji li razlika u visini/težini ljudi s obzirom na tip ličnosti?
+
+## Conclusion
+
+# RQ-4: Možete li pomoću danih značajki naslutiti tip ličnosti ili rezultat na pojedinoj karakteristici?
+
+## Conclusion
+
+# RQ-X:
+
+## Conclusion
+
+# Conclusions
