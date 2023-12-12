@@ -1,33 +1,239 @@
+---
+title: "Relationship between MBTI personality types and physical traits"
+author: "Tina Bakić, Luka Korov, Dora Baričević, Roko Grbelja"
+date: "Dec 13, 2023"
+output:
+  html_document:
+    theme: darkly
+    toc: yes
+    toc_float:
+      collapsed: true
+subtitle: ""
+---
+
 # Introduction
+
+## Libraries
+
+```{r}
+library(hexbin)
+```
 
 ## Dataset
 
+Dataset contains physical and personality data of 97 randomly sampled subjects. All subjects were French-Canadian, living in Canada between the Québec and Sorel-Tracy areas. The Biotonix analyses and report were used on the subjects being tested in order to distinguish postural deviations. Personality was determined by using the Myers-Briggs Type Indicator questionnaire.
+
+Gathered data includes following characteristics for all subjects:
+
+```{r table2, echo=FALSE, message=FALSE, warnings=FALSE, results='asis'}
+tabl <- "
+
+|Column name    |Description                    |
+|---------------|-------------------------------|
+|AGE            |age in years|
+|HEIGHT         |height in inches|
+|WEIGHT         |weight in pounds|
+|SEX            |biological gender (female/male)|
+|ACTIVITY.LEVEL |physical activity level (low/moderate/high)|
+|PAIN.1         |level of neck pain (0-100)|
+|PAIN.2         |level of pain in upper back (0-100)|
+|PAIN.3         |level of pain in middle back (0-100)|
+|PAIN.4         |level of pain in lower back (0-100)|
+|MBTI           |Myers-Briggs personality type|
+|E              |level of extraversion|
+|I              |level of introversion|      
+|S              |level of sensing|
+|N              |level of intuition|
+|T              |level of thinking|
+|F              |level of feeling|
+|J              |level of judging|
+|P              |level of perceiving|
+|POSTURE        |posutre type (A - ideal, B - kyphosis-lordosis, C - flat back, D - sway-back)|
+"
+cat(tabl)
+```
+
 ```{r}
 dataset_mbti = read.csv("datasets/MBTI.csv")
-dim(dataset_mbti)
-summary(dataset_mbti)
+```
+
+### Transformations
+
+1. to metric system + BMI
+
+```{r}
+dataset_mbti$HEIGHT_CM <- dataset_mbti$HEIGHT * 2.54
+dataset_mbti$WEIGHT_KG <- dataset_mbti$WEIGHT * 0.453592
+dataset_mbti$BMI <- dataset_mbti$WEIGHT_KG / (dataset_mbti$HEIGHT_CM/100)^2
+```
+
+2. separating each personality trait
+
+```{r}
+dataset_mbti$MBTI_EI <- substring(dataset_mbti$MBTI, 1, 1)
+dataset_mbti$MBTI_SN <- substring(dataset_mbti$MBTI, 2, 2)
+dataset_mbti$MBTI_TF <- substring(dataset_mbti$MBTI, 3, 3)
+dataset_mbti$MBTI_JP <- substring(dataset_mbti$MBTI, 4, 4)
+```
+
+3. from categories to numerical
+
+```{r}
+dataset_mbti$SEX_INT <- match(dataset_mbti$SEX, c("Female", "Male"))
+dataset_mbti$ACTIVITY.LEVEL_INT <- match(dataset_mbti$ACTIVITY.LEVEL, c("Low", "Moderate", "High"))
+dataset_mbti$POSTURE_INT <- match(dataset_mbti$POSTURE, c("A", "B", "C", "D"))
 ```
 
 ## Research questions
 
-# RQ-1: Postoji li veza izmedu tipa ličnosti i načina držanja?
+1. Is there a connection between personality type and posture?
+2. Are physically attractive people also more extraverted?
+3. Is there a difference in height/weight based on personality type?
+4. Can you predict a personality type or a specific personality characteristic based on physical traits?
+
+
+# RQ-1: Is there a connection between personality type and posture?
+
+*[HR]* Postoji li veza izmedu tipa ličnosti i načina držanja?
+
+```{r}
+table(
+  dataset_mbti$POSTURE,
+  dataset_mbti$MBTI
+  )
+
+table(
+  dataset_mbti$POSTURE,
+  dataset_mbti$MBTI_EI
+  )
+
+
+table(
+  dataset_mbti$POSTURE,
+  dataset_mbti$MBTI_SN
+  )
+
+table(
+  dataset_mbti$POSTURE,
+  dataset_mbti$MBTI_TF
+  )
+
+
+table(
+  dataset_mbti$POSTURE,
+  dataset_mbti$MBTI_JP
+  )
+```
 
 ## Conclusion
 
-# RQ-2: Jesu li fizički aktivniji ljudi takoder i ekstrovertiraniji?
+There is a significant ...
+
+
+# RQ-2: Are physically attractive people also more extraverted?
+
+*[HR]* Jesu li fizički aktivniji ljudi također i ekstrovertiraniji?
+
+Define physically attractive
+
+Conduct independency test
+
+
+## Conclusion
+Physically attractive people are/aren't also more extraverted.
+
+
+# RQ-3: Is there a difference in height/weight based on personality type?
+
+*[HR]* Postoji li razlika u visini/težini ljudi s obzirom na tip ličnosti?
+
+Box plot check
+
+```{r}
+boxplot(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$HEIGHT_CM, 
+        dataset_mbti[dataset_mbti$MBTI_EI == "I",]$HEIGHT_CM,
+        names = c("Extraverts", "Introverts"),
+        main = "Height for extra/introversion")
+
+boxplot(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$WEIGHT_KG, 
+        dataset_mbti[dataset_mbti$MBTI_EI == "I",]$WEIGHT_KG,
+        names = c("Extraverts", "Introverts"),
+        main = "Weight for extra/introversion")
+
+boxplot(dataset_mbti[dataset_mbti$MBTI_SN == "S",]$HEIGHT_CM, 
+        dataset_mbti[dataset_mbti$MBTI_SN == "N",]$HEIGHT_CM,
+        names = c("Sensing", "Intuition"),
+        main = "Height for sensing/intuition")
+
+boxplot(dataset_mbti[dataset_mbti$MBTI_SN == "S",]$WEIGHT_KG, 
+        dataset_mbti[dataset_mbti$MBTI_SN == "N",]$WEIGHT_KG,
+        names = c("Sensing", "Intuition"),
+        main = "Weight for sensing/intuition")
+```
+
+Normality check
+
+```{r}
+qqnorm(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$WEIGHT_KG, 
+       pch = 1, frame = FALSE,
+       main='Weight of extraverts')
+qqline(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$WEIGHT_KG, 
+       col = "steelblue", lwd = 2)
+
+qqnorm(dataset_mbti[dataset_mbti$MBTI_EI == "I",]$WEIGHT_KG, 
+       pch = 1, frame = FALSE,
+       main='Weight of introverts')
+qqline(dataset_mbti[dataset_mbti$MBTI_EI == "I",]$WEIGHT_KG, 
+       col = "steelblue", lwd = 2)
+```
+
+Variant equality check
+
+```{r}
+var.test(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$WEIGHT_KG, dataset_mbti[dataset_mbti$MBTI_EI == "I",]$WEIGHT_KG)
+```
+
+T-test with equal/different variants
+
+```{r}
+t.test(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$WEIGHT_KG, dataset_mbti[dataset_mbti$MBTI_EI == "I",]$WEIGHT_KG, alt = "greater", var.equal = TRUE)
+```
 
 ## Conclusion
 
-# RQ-3: Postoji li razlika u visini/težini ljudi s obzirom na tip ličnosti?
+
+# RQ-4: Can you predict a personality type or a specific personality characteristic based on physical traits?
+
+*[HR]* Možete li pomoću danih značajki naslutiti tip ličnosti ili rezultat na pojedinoj karakteristici?
+
+Linear regression for E/I values
+
+```{r}
+summary(lm(E ~ POSTURE_INT, dataset_mbti))
+```
+
+Based on regression coefficients, calculate the expected value for certain physical trait
+
+```{r}
+
+```
+
+Logistic regression for categories
+
+```{r}
+
+```
+
 
 ## Conclusion
 
-# RQ-4: Možete li pomoću danih značajki naslutiti tip ličnosti ili rezultat na pojedinoj karakteristici?
+Based on posture/height/weight/something we can predict a personality characteristic...
 
-## Conclusion
 
-# RQ-X:
+# Discussion
 
-## Conclusion
 
-# Conclusions
+
+# Resources
+
+1. Sylvain Guimond, Wael Massrieh: Intricate Correlation between Body Posture, Personality Trait and Incidence of Body Pain: A Cross-Referential Study Report (https://doi.org/10.1371/journal.pone.0037450)
