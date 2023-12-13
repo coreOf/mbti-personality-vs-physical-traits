@@ -84,12 +84,22 @@ dataset_mbti$ACTIVITY.LEVEL_INT <- match(dataset_mbti$ACTIVITY.LEVEL, c("Low", "
 dataset_mbti$POSTURE_INT <- match(dataset_mbti$POSTURE, c("A", "B", "C", "D"))
 ```
 
+```{r}
+plot(dataset_mbti$E, dataset_mbti$I)
+plot(dataset_mbti$S, dataset_mbti$N)
+plot(dataset_mbti$T, dataset_mbti$F)
+plot(dataset_mbti$J, dataset_mbti$P)
+```
+
 ## Research questions
 
 1. Is there a connection between personality type and posture?
 2. Are physically attractive people also more extraverted?
 3. Is there a difference in height/weight based on personality type?
 4. Can you predict a personality type or a specific personality characteristic based on physical traits?
+
+5. Are women more feeling than men?
+6. Is there a connection between generation (age) and personality types?
 
 
 # RQ-1: Is there a connection between personality type and posture?
@@ -209,13 +219,80 @@ t.test(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$WEIGHT_KG, dataset_mbti[datase
 Linear regression for E/I values
 
 ```{r}
-summary(lm(E ~ POSTURE_INT, dataset_mbti))
+plot(dataset_mbti$AGE, dataset_mbti$E)
+plot(dataset_mbti$HEIGHT_CM, dataset_mbti$E)
+plot(dataset_mbti$WEIGHT_KG, dataset_mbti$E)
+plot(dataset_mbti$BMI, dataset_mbti$E)
+boxplot(dataset_mbti[dataset_mbti$SEX == "Female",]$E, 
+        dataset_mbti[dataset_mbti$SEX == "Male",]$E,
+        names = c("Female", "Male"),
+        main = "Extraversion per gender")
+boxplot(dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Low",]$E, 
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Moderate",]$E,
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "High",]$E,
+        names = c("Low", "Moderate", "High"),
+        main = "Extraversion per activity level")
+boxplot(dataset_mbti[dataset_mbti$POSTURE == "A",]$E, 
+        dataset_mbti[dataset_mbti$POSTURE == "B",]$E, 
+        dataset_mbti[dataset_mbti$POSTURE == "C",]$E, 
+        dataset_mbti[dataset_mbti$POSTURE == "D",]$E,
+        names = c("A", "B", "C", "D"),
+        main = "Extraversion per posture")
+
+plot(dataset_mbti$AGE, dataset_mbti$J)
+plot(dataset_mbti$HEIGHT_CM, dataset_mbti$J)
+plot(dataset_mbti$WEIGHT_KG, dataset_mbti$J)
+plot(dataset_mbti$BMI, dataset_mbti$J)
+boxplot(dataset_mbti[dataset_mbti$SEX == "Female",]$J, 
+        dataset_mbti[dataset_mbti$SEX == "Male",]$J,
+        names = c("Female", "Male"),
+        main = "Judging per gender")
+boxplot(dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Low",]$J, 
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Moderate",]$J,
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "High",]$J,
+        names = c("Low", "Moderate", "High"),
+        main = "Judging per activity level")
+boxplot(dataset_mbti[dataset_mbti$POSTURE == "A",]$J, 
+        dataset_mbti[dataset_mbti$POSTURE == "B",]$J, 
+        dataset_mbti[dataset_mbti$POSTURE == "C",]$J, 
+        dataset_mbti[dataset_mbti$POSTURE == "D",]$J,
+        names = c("A", "B", "C", "D"),
+        main = "Judging per posture")
+
+
+plot(dataset_mbti$AGE, dataset_mbti$T)
+plot(dataset_mbti$HEIGHT_CM, dataset_mbti$T)
+plot(dataset_mbti$WEIGHT_KG, dataset_mbti$T)
+plot(dataset_mbti$BMI, dataset_mbti$T)
+boxplot(dataset_mbti[dataset_mbti$SEX == "Female",]$T, 
+        dataset_mbti[dataset_mbti$SEX == "Male",]$T,
+        names = c("Female", "Male"),
+        main = "Judging per gender")
+boxplot(dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Low",]$T, 
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Moderate",]$T,
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "High",]$T,
+        names = c("Low", "Moderate", "High"),
+        main = "Judging per activity level")
+boxplot(dataset_mbti[dataset_mbti$POSTURE == "A",]$T, 
+        dataset_mbti[dataset_mbti$POSTURE == "B",]$T, 
+        dataset_mbti[dataset_mbti$POSTURE == "C",]$T, 
+        dataset_mbti[dataset_mbti$POSTURE == "D",]$T,
+        names = c("A", "B", "C", "D"),
+        main = "Judging per posture")
 ```
+
+Use fastDummies for posture, beware of co-linear columns
 
 Based on regression coefficients, calculate the expected value for certain physical trait
 
 ```{r}
+summary(lm(E ~ POSTURE_INT + PAIN.1 + PAIN.4, dataset_mbti))
 
+summary(lm(J ~ POSTURE_INT, dataset_mbti))
+
+summary(lm(POSTURE_INT ~ E + S + T + J, dataset_mbti))
+summary(lm(ACTIVITY.LEVEL_INT ~ E + S + T + J, dataset_mbti))
+summary(lm(SEX_INT ~ E + S + T + J, dataset_mbti))
 ```
 
 Logistic regression for categories
