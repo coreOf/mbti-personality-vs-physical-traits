@@ -1,14 +1,14 @@
 ---
 title: "Relationship between MBTI personality types and physical traits"
 author: "Tina Bakić, Luka Korov, Dora Baričević, Roko Grbelja"
-date: "Dec 13, 2023"
+date: "Dec 14, 2023"
 output:
   html_document:
     theme: darkly
     toc: yes
     toc_float:
       collapsed: true
-subtitle: ""
+subtitle: "Project task for Statistical Data Analysis course at University of Zagreb, Faculty of Electrical Engineering and Computing"
 ---
 
 # Introduction
@@ -17,6 +17,7 @@ subtitle: ""
 
 ```{r}
 library(hexbin)
+library(dplyr)
 ```
 
 ## Dataset
@@ -59,7 +60,7 @@ dataset_mbti = read.csv("datasets/MBTI.csv")
 
 ### Transformations
 
-1. to metric system + BMI
+1.  to metric system + BMI
 
 ```{r}
 dataset_mbti$HEIGHT_CM <- dataset_mbti$HEIGHT * 2.54
@@ -67,7 +68,7 @@ dataset_mbti$WEIGHT_KG <- dataset_mbti$WEIGHT * 0.453592
 dataset_mbti$BMI <- dataset_mbti$WEIGHT_KG / (dataset_mbti$HEIGHT_CM/100)^2
 ```
 
-2. separating each personality trait
+2.  separating each personality trait
 
 ```{r}
 dataset_mbti$MBTI_EI <- substring(dataset_mbti$MBTI, 1, 1)
@@ -76,12 +77,24 @@ dataset_mbti$MBTI_TF <- substring(dataset_mbti$MBTI, 3, 3)
 dataset_mbti$MBTI_JP <- substring(dataset_mbti$MBTI, 4, 4)
 ```
 
-3. from categories to numerical
+3.  from categories to numerical
 
 ```{r}
 dataset_mbti$SEX_INT <- match(dataset_mbti$SEX, c("Female", "Male"))
 dataset_mbti$ACTIVITY.LEVEL_INT <- match(dataset_mbti$ACTIVITY.LEVEL, c("Low", "Moderate", "High"))
 dataset_mbti$POSTURE_INT <- match(dataset_mbti$POSTURE, c("A", "B", "C", "D"))
+```
+
+4.  grouping similar personality types
+
+```{r}
+dataset_mbti %>%
+  mutate(MBTI_GROUP = case_when(
+    MBTI == "INTJ" | MBTI == "INTP" | MBTI == "ENTJ" | MBTI == "ENTP" ~ "Analyst",
+    MBTI == "INFJ" | MBTI == "INFP" | MBTI == "ENFJ" | MBTI == "ENFP" ~ "Diplomat",
+    MBTI == "ISTJ" | MBTI == "ISFJ" | MBTI == "ESTJ" | MBTI == "ESFJ" ~ "Sentinel",
+    MBTI == "ISTP" | MBTI == "ISFP" | MBTI == "ESTP" | MBTI == "ESFP" ~ "Explorer"
+    ))
 ```
 
 ```{r}
@@ -93,18 +106,23 @@ plot(dataset_mbti$J, dataset_mbti$P)
 
 ## Research questions
 
-1. Is there a connection between personality type and posture?
-2. Are physically attractive people also more extraverted?
-3. Is there a difference in height/weight based on personality type?
-4. Can you predict a personality type or a specific personality characteristic based on physical traits?
+1.  Is there a connection between personality type and posture?
 
-5. Are women more feeling than men?
-6. Is there a connection between generation (age) and personality types?
+2.  Are physically active people also more extroverted?
 
+3.  Is there a difference in height/weight based on personality type?
+
+4.  Can you predict a personality type or a specific personality characteristic based on physical traits?
+
+5.  Are women more feeling than men?
+
+6.  Is there a connection between generation (age) and personality types?
 
 # RQ-1: Is there a connection between personality type and posture?
 
 *[HR]* Postoji li veza izmedu tipa ličnosti i načina držanja?
+
+kategorije sa 16personalities.com
 
 ```{r}
 table(
@@ -139,19 +157,29 @@ table(
 
 There is a significant ...
 
-
-# RQ-2: Are physically attractive people also more extraverted?
+# RQ-2: Are physically active people also more extroverted?
 
 *[HR]* Jesu li fizički aktivniji ljudi također i ekstrovertiraniji?
 
-Define physically attractive
+```{r}
+boxplot(dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Low",]$E, 
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Moderate",]$E,
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "High",]$E,
+        names = c("Low", "Moderate", "High"),
+        main = "Extraversion per activity level")
+```
 
-Conduct independency test
+ANOVA
 
+Independency
+
+```{r}
+table(dataset_mbti$ACTIVITY.LEVEL, dataset_mbti$MBTI_EI)
+```
 
 ## Conclusion
-Physically attractive people are/aren't also more extraverted.
 
+Physically active people are/aren't also more extroverted.
 
 # RQ-3: Is there a difference in height/weight based on personality type?
 
@@ -210,7 +238,6 @@ t.test(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$WEIGHT_KG, dataset_mbti[datase
 ```
 
 ## Conclusion
-
 
 # RQ-4: Can you predict a personality type or a specific personality characteristic based on physical traits?
 
@@ -281,12 +308,12 @@ boxplot(dataset_mbti[dataset_mbti$POSTURE == "A",]$T,
         main = "Judging per posture")
 ```
 
-Use fastDummies for posture, beware of co-linear columns
+Use fastDummies for posture and MBTI gruops, beware of co-linear columns
 
 Based on regression coefficients, calculate the expected value for certain physical trait
 
 ```{r}
-summary(lm(E ~ POSTURE_INT + PAIN.1 + PAIN.4, dataset_mbti))
+summary(lm(E ~ POSTURE_INT + PAIN.1 + PAIN.4 + HEIGHT_CM + WEIGHT_KG + F, dataset_mbti))
 
 summary(lm(J ~ POSTURE_INT, dataset_mbti))
 
@@ -301,16 +328,12 @@ Logistic regression for categories
 
 ```
 
-
 ## Conclusion
 
 Based on posture/height/weight/something we can predict a personality characteristic...
 
-
 # Discussion
-
-
 
 # Resources
 
-1. Sylvain Guimond, Wael Massrieh: Intricate Correlation between Body Posture, Personality Trait and Incidence of Body Pain: A Cross-Referential Study Report (https://doi.org/10.1371/journal.pone.0037450)
+1.  Sylvain Guimond, Wael Massrieh: Intricate Correlation between Body Posture, Personality Trait and Incidence of Body Pain: A Cross-Referential Study Report (<https://doi.org/10.1371/journal.pone.0037450>)
