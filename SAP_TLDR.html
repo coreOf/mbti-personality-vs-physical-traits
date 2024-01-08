@@ -11,6 +11,7 @@
 
 <meta name="author" content="Tina Bakić, Luka Korov, Dora Baričević, Roko Grbelja" />
 
+<meta name="date" content="2024-01-08" />
 
 <title>Relationship between MBTI personality types and physical traits</title>
 
@@ -1498,9 +1499,12 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Relationship between MBTI personality types
 and physical traits</h1>
+<h3 class="subtitle">Project task for Statistical Data Analysis course
+at University of Zagreb, Faculty of Electrical Engineering and
+Computing</h3>
 <h4 class="author">Tina Bakić, Luka Korov, Dora Baričević, Roko
 Grbelja</h4>
-<h4 class="date">Dec 13, 2023</h4>
+<h4 class="date">2024-01-08</h4>
 
 </div>
 
@@ -1511,6 +1515,8 @@ Grbelja</h4>
 <h2>Libraries</h2>
 <pre class="r"><code>library(hexbin)</code></pre>
 <pre><code>## Warning: package &#39;hexbin&#39; was built under R version 4.3.2</code></pre>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>## Warning: package &#39;dplyr&#39; was built under R version 4.3.2</code></pre>
 </div>
 <div id="dataset" class="section level2">
 <h2>Dataset</h2>
@@ -1635,6 +1641,408 @@ dataset_mbti$MBTI_JP &lt;- substring(dataset_mbti$MBTI, 4, 4)</code></pre>
 <pre class="r"><code>dataset_mbti$SEX_INT &lt;- match(dataset_mbti$SEX, c(&quot;Female&quot;, &quot;Male&quot;))
 dataset_mbti$ACTIVITY.LEVEL_INT &lt;- match(dataset_mbti$ACTIVITY.LEVEL, c(&quot;Low&quot;, &quot;Moderate&quot;, &quot;High&quot;))
 dataset_mbti$POSTURE_INT &lt;- match(dataset_mbti$POSTURE, c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;))</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li>grouping similar personality types</li>
+</ol>
+<pre class="r"><code>dataset_mbti %&gt;%
+  mutate(MBTI_GROUP = case_when(
+    MBTI == &quot;INTJ&quot; | MBTI == &quot;INTP&quot; | MBTI == &quot;ENTJ&quot; | MBTI == &quot;ENTP&quot; ~ &quot;Analyst&quot;,
+    MBTI == &quot;INFJ&quot; | MBTI == &quot;INFP&quot; | MBTI == &quot;ENFJ&quot; | MBTI == &quot;ENFP&quot; ~ &quot;Diplomat&quot;,
+    MBTI == &quot;ISTJ&quot; | MBTI == &quot;ISFJ&quot; | MBTI == &quot;ESTJ&quot; | MBTI == &quot;ESFJ&quot; ~ &quot;Sentinel&quot;,
+    MBTI == &quot;ISTP&quot; | MBTI == &quot;ISFP&quot; | MBTI == &quot;ESTP&quot; | MBTI == &quot;ESFP&quot; ~ &quot;Explorer&quot;
+    ))</code></pre>
+<pre><code>##     X S.No AGE HEIGHT WEIGHT    SEX ACTIVITY.LEVEL PAIN.1 PAIN.2 PAIN.3 PAIN.4
+## 1   0    1  53     62    125 Female            Low    0.0    0.0    0.0    0.0
+## 2   1    2  52     69    157   Male           High    7.0    8.0    5.0    3.0
+## 3   2    3  30     69    200   Male           High    0.0    0.0    0.0    0.0
+## 4   3    4  51     66    175   Male       Moderate    9.5    9.5    9.5    1.5
+## 5   4    5  45     63    199 Female       Moderate    4.0    5.0    2.0    2.0
+## 6   5    6  68     74    182   Male            Low    0.0    2.5    1.5    0.0
+## 7   6    7  62     68    263   Male            Low    7.0   10.0   10.0   10.0
+## 8   7    8  65     61    143 Female            Low    0.0    9.0    5.0   10.0
+## 9   8    9  66     67    180   Male            Low    0.5    3.5    0.5    9.5
+## 10  9   10  58     69    165   Male            Low    0.0    7.5    7.0    3.0
+## 11 10   11  61     67    210   Male            Low    5.0    0.0    0.0    9.0
+## 12 11   12  33     62    120 Female            Low    0.0    3.0    0.0    0.0
+## 13 12   13  48     64    127 Female            Low    5.0    7.0    8.0    7.0
+## 14 13   14  57     68    185   Male            Low    2.5    7.5    1.5    5.5
+## 15 14   15  30     69    190   Male       Moderate    0.0    0.0    4.0    7.0
+## 16 15   16  62     71    165   Male            Low    0.0    1.0    0.0    0.0
+## 17 16   17  59     66    138 Female            Low    6.0    3.0    6.0    6.0
+## 18 17   18  33     72    171   Male       Moderate    4.0    9.0    8.0    0.0
+## 19 18   19  23     65    110 Female            Low    4.5    8.5    0.0    0.0
+## 20 19   20  48     63    154 Female            Low    8.0    8.0    6.0    9.0
+## 21 20   21  63     66    185 Female            Low    8.0    0.0    3.0    7.0
+## 22 21   22  64     69    176   Male            Low    0.5    0.5    0.5    0.5
+## 23 22   23  71     68    156 Female            Low    2.0    8.0    0.0    6.0
+## 24 23   24  71     61    140 Female            Low    8.0    3.0    3.0    8.0
+## 25 24   25  50     60    118 Female       Moderate    7.0    5.0    2.0    0.0
+## 26 25   26  41     65    133 Female            Low    7.0    4.0    0.0    0.0
+## 27 26   27  36     68    165   Male           High    0.0    2.0    0.0    0.0
+## 28 27   28  40     62    113 Female            Low    2.0    3.0    0.0    0.0
+## 29 28   29  26     65    150   Male            Low    1.0    0.0    1.0    2.0
+## 30 29   30  43     63    175   Male       Moderate    0.0    0.0    0.0    5.0
+## 31 30   31  46     66    222   Male            Low    0.0    0.0    0.0    8.0
+## 32 31   32  47     69    152   Male            Low    0.0    0.0    3.5    5.5
+## 33 32   33  20     67    135   Male            Low    0.0    7.0    0.0    0.0
+## 34 33   34  34     73    200   Male            Low    0.0    8.0    6.0    0.0
+## 35 34   35  54     62    190 Female            Low    0.0    5.0    4.0    0.0
+## 36 35   36  66     63    142 Female            Low    2.0    0.0    0.0    0.0
+## 37 36   37  42     68    170   Male           High    0.0   10.0    0.0    0.0
+## 38 37   38  52     66    222   Male            Low    3.0    5.0    4.0    3.0
+## 39 38   39  61     63    155   Male            Low    3.5    3.5    3.5    6.0
+## 40 39   40  49     69    190   Male            Low    2.0    9.0    5.0    3.0
+## 41 40   41  17     69    145   Male       Moderate    0.0    7.0    2.0    0.0
+## 42 41   42  57     70    160   Male            Low    0.0    7.0    0.0    0.0
+## 43 42   43  82     60    159   Male            Low    0.0    0.0    0.0    0.0
+## 44 43   44  48     61    138 Female            Low    0.0    0.0    0.0    0.0
+## 45 44   45  80     59    115 Female            Low    0.0    0.0    0.0    0.0
+## 46 45   46  66     66    184   Male            Low    4.0    3.0    0.0    0.0
+## 47 46   47  63     62    150 Female            Low    2.0   10.0    0.0    4.0
+## 48 47   48  13     62    127 Female            Low    3.0    2.0    2.0    5.0
+## 49 48   49  20     68    155   Male            Low    1.0    4.0    1.0    2.0
+## 50 49   50  18     66    150 Female            Low    3.0    3.0    5.0    6.0
+## 51 50   51  56     62    130 Female            Low    0.0    2.0    0.0    0.0
+## 52 51   52  56     64    165   Male            Low    0.0    5.0    0.0    0.0
+## 53 52   53  50     65    172 Female            Low    0.0    0.0    0.0    3.0
+## 54 53   54  19     68    113 Female            Low    0.0    4.0    6.0    2.0
+## 55 54   55  47     63    128 Female            Low    7.5    4.0    3.0    7.5
+## 56 55   56  62     61    150 Female            Low    2.0    2.0    2.0    2.0
+## 57 56   57  29     68    145 Female       Moderate    0.0    9.0    2.0    0.0
+## 58 57   58  20     70    250   Male            Low    4.0    8.0    2.0    5.0
+## 59 58   59  43     62    160 Female            Low    0.0    5.0    0.0    0.0
+## 60 59   60  43     64    183   Male            Low    0.0    3.0    4.0    0.0
+## 61 60   61  42     63    166 Female            Low    0.0    0.0    0.0    8.0
+## 62 61   62  25     67    160   Male            Low    5.0    0.0    8.0    0.0
+## 63 62   63  21     62    118 Female            Low    7.5    2.5    6.5    0.0
+## 64 63   64  28     62    200   Male            Low    0.0    8.0    0.0    5.0
+## 65 64   65  42     70    170   Male            Low    0.0    4.0    0.0    0.0
+## 66 65   66  18     62    110 Female            Low    4.0    5.0    0.0    0.0
+## 67 66   67  24     73    155   Male           High    2.0    3.0    0.0    0.0
+## 68 67   68  39     70    200   Male       Moderate    0.0    3.0    0.0    0.0
+## 69 68   69  60     68    222   Male            Low    0.5    0.5    0.5    2.5
+## 70 69   70  37     60    105 Female            Low    2.0    8.0    2.0    6.0
+## 71 70   71  30     67    135 Female            Low    5.0    5.0    0.0    1.0
+## 72 71   72  45     67    148   Male            Low    2.0    3.0    0.0    5.0
+## 73 72   73  45     65    160 Female            Low    2.0    3.0    0.0    0.0
+## 74 73   74  53     73    170   Male            Low    0.0    0.0    0.0    0.0
+## 75 74   75  49     71    230   Male       Moderate    0.0    4.0    0.0    4.0
+## 76 75   76  45     67    160 Female            Low    2.0    0.0    2.0    0.0
+## 77 76   77  55     74    240   Male            Low    0.0    7.0    0.0    4.0
+## 78 77   78  45     64    118 Female       Moderate    0.0    4.0    0.0    4.0
+## 79 78   79  75     63    143 Female            Low    4.0    6.0    4.0    6.0
+## 80 79   80  44     66    200 Female            Low    2.0    3.0    2.0    0.0
+## 81 80   81  48     71    145   Male            Low    0.0    7.0    4.0    0.0
+## 82 81   82  49     64    155 Female            Low    4.0    7.0    3.0    5.0
+## 83 82   83  16     58     81 Female            Low    0.0    0.0    2.0    0.0
+## 84 83   84  39     60     88 Female            Low    3.0    1.0    0.0    0.0
+## 85 84   85  19     68    125 Female            Low    0.0    3.0    0.0    0.0
+## 86 85   86  11     60     68   Male           High    5.0    3.0    1.0    0.0
+## 87 86   87  55     65    198   Male            Low    4.0    2.5    3.0    8.0
+## 88 87   88  28     67    180 Female            Low    0.0    0.0    0.0    0.0
+## 89 88   89  22     65    193 Female            Low    5.0    7.0    7.0    0.0
+## 90 89   90  56     67    150 Female            Low    0.0    7.0    0.0    0.0
+## 91 90   91  29     65    125 Female       Moderate    2.0    0.0    0.0    4.0
+## 92 91   92  16     69    130 Female       Moderate    5.0    0.0    5.0    7.0
+## 93 92   93  16     58    100   Male       Moderate    0.0    0.0    0.0    3.0
+## 94 93   94  45     62    134 Female       Moderate    0.0    4.0    0.0    0.0
+## 95 94   95  43     69    188   Male       Moderate    2.0    0.0    0.0    0.0
+## 96 95   96  28     67    180 Female            Low    0.0    0.0    0.0    0.0
+## 97 96   97  43     69    188   Male       Moderate    4.0    0.0    0.0    0.0
+##    MBTI          E          I           S           N          T          F
+## 1  ESFJ  0.9084579 -1.0968036 -0.06968492 -0.67448975 -0.3186394  0.1046335
+## 2  ISTJ -0.6045853  0.4727891 -0.28221615 -0.43072730  1.1503494 -1.1503494
+## 3  ESTJ  0.4727891 -0.6045853 -0.13971030 -0.58945580  0.3186394 -0.3186394
+## 4  ISTJ -0.6045853  0.4727891  0.21042839 -1.08532491  0.1046335 -0.1046335
+## 5  ENFJ  0.3487557 -0.4727891  0.13971030 -0.96742157 -0.3186394  0.3186394
+## 6  ISFP -0.9084579  0.7478586 -0.06968492 -0.67448975 -0.1046335  0.1046335
+## 7  ISTP -0.4727891  0.3487557  0.13971030 -0.96742157  0.2104284 -0.2104284
+## 8  ESTJ  0.7478586 -0.9084579 -0.06968492 -0.67448975  0.8122178 -0.8122178
+## 9  ESFJ  1.0968036 -1.3351777  0.00000000 -0.76470967 -0.1046335  0.1046335
+## 10 INFJ -0.7478586  0.6045853 -0.35549042 -0.35549042 -0.1046335  0.1046335
+## 11 ENTP  0.0000000 -0.1141853 -0.96742157  0.13971030  0.4307273 -0.4307273
+## 12 ISFJ -1.3351777  1.0968036  0.28221615 -1.22064035 -0.3186394  0.3186394
+## 13 ESFJ  0.2298841 -0.3487557 -0.28221615 -0.43072730 -0.3186394  0.3186394
+## 14 ENTJ  0.6045853 -0.7478586 -0.43072730 -0.28221615  0.3186394 -0.3186394
+## 15 ESTP  1.3351777 -1.6906216  0.28221615 -1.22064035  0.1046335 -0.1046335
+## 16 ISTJ -1.3351777  1.0968036 -0.28221615 -0.43072730  1.3829941 -1.3829941
+## 17 ESTJ  0.1141853 -0.2298841  0.00000000 -0.76470967  0.2104284 -0.2104284
+## 18 ENFP  0.7478586 -0.9084579 -0.58945580 -0.13971030 -0.1046335  0.1046335
+## 19 ESFP  0.2298841 -0.3487557 -0.21042839 -0.50848806  0.0000000  0.0000000
+## 20 ISFP -0.2298841  0.2298841 -0.13971030 -0.58945580 -0.1046335  0.1046335
+## 21 INFP -1.3351777  1.0968036 -0.58945580 -0.13971030 -0.2104284  0.2104284
+## 22 ESTP  0.2298841 -0.3487557  0.50848806 -1.91450583  0.6744898 -0.6744898
+## 23 ESTP  0.2298841 -0.3487557 -0.21042839 -0.50848806  0.4307273 -0.4307273
+## 24 ESFJ  0.1141853 -0.2298841  0.35549042 -1.38299413 -0.8122178  0.8122178
+## 25 INFJ -1.3351777  1.0968036 -0.50848806 -0.21042839 -1.7316644  1.7316644
+## 26 ISFJ -1.0968036  0.9084579  0.13971030 -0.96742157 -0.8122178  0.8122178
+## 27 ESTP  0.6045853 -0.7478586  0.13971030 -0.96742157  0.3186394 -0.3186394
+## 28 ISTP -0.4727891  0.3487557 -0.21042839 -0.50848806  0.2104284 -0.2104284
+## 29 ENTJ  0.4727891 -0.6045853 -0.43072730 -0.28221615  0.1046335 -0.1046335
+## 30 ENFP  1.6906216 -2.3263479 -1.08532491  0.21042839 -1.7316644  1.7316644
+## 31 ESFP  0.9084579 -1.0968036 -0.28221615 -0.43072730  0.0000000  0.0000000
+## 32 ESTJ  0.1141853 -0.2298841  0.06968492 -0.86163412  0.2104284 -0.2104284
+## 33 ESTP  0.4727891 -0.6045853 -0.28221615 -0.43072730  0.2104284 -0.2104284
+## 34 ENTJ  1.6906216 -2.3263479 -0.96742157  0.13971030  0.3186394 -0.3186394
+## 35 ISFP -0.9084579  0.7478586  0.21042839 -1.08532491 -0.3186394  0.3186394
+## 36 ISTJ -0.9084579  0.7478586 -0.13971030 -0.58945580  0.5485223 -0.5485223
+## 37 ENFJ  0.7478586 -0.9084579 -0.58945580 -0.13971030 -0.4307273  0.4307273
+## 38 ENFP  0.7478586 -0.9084579 -1.08532491  0.21042839 -1.7316644  1.7316644
+## 39 ESTP  0.9084579 -1.0968036  0.35549042 -1.38299413  0.3186394 -0.3186394
+## 40 ENFJ  0.2298841 -0.3487557 -0.58945580 -0.13971030 -0.4307273  0.4307273
+## 41 INFP -0.2298841  0.1141853 -0.76470967  0.00000000 -0.6744898  0.6744898
+## 42 ISFP -0.6045853  0.3487557 -0.06968492 -0.67448975  0.0000000  0.0000000
+## 43 ESFP  1.6906216 -2.3263479  0.13971030 -0.96742157 -0.6744898  0.6744898
+## 44 ENFP  1.6906216 -2.3263479 -0.58945580 -0.13971030 -0.9674216  0.9674216
+## 45 ENFP  1.0968036 -1.3351777 -0.50848806 -0.21042839 -0.6744898  0.6744898
+## 46 ISTJ -0.1141853  0.0000000  0.00000000 -0.76470967  1.1503494 -1.1503494
+## 47 ISFP -0.2298841  0.1141853  0.13971030 -0.96742157 -2.3263479  2.3263479
+## 48 ENFJ  1.6906216 -2.3263479 -0.86163412 -0.06968492 -1.3829941  1.1503494
+## 49 ESTP  0.6045853 -0.7478586 -0.06968492 -0.67448975  0.3186394 -0.3186394
+## 50 INFJ -0.4727891  0.1141853 -0.35549042 -0.35549042 -0.4307273  0.4307273
+## 51 ESFP  0.9084579 -1.0968036  0.21042839 -1.22064035 -0.8122178  0.8122178
+## 52 ENTP  0.6045853 -0.7478586 -0.43072730 -0.28221615  0.4307273 -0.4307273
+## 53 ESFP  0.3487557 -0.4727891  0.06968492 -0.86163412 -1.7316644  1.7316644
+## 54 INFJ -0.4727891  0.3487557  0.00000000 -0.76470967  0.0000000  0.0000000
+## 55 ESFJ  0.6045853 -0.7478586 -0.13971030 -0.58945580 -0.2104284  0.2104284
+## 56 ESTJ  0.7478586 -0.9084579  0.13971030 -0.96742157 -0.4307273  0.4307273
+## 57 ESFP  1.0968036 -1.3351777 -0.13971030 -0.58945580 -0.9674216  0.9674216
+## 58 ESFP  0.7478586 -0.9084579 -0.28221615 -0.43072730 -0.5485223  0.5485223
+## 59 ISFJ -0.2298841  0.1141853  0.28221615 -1.22064035 -0.8122178  0.8122178
+## 60 ISTP -0.9084579  0.7478586 -0.21042839 -0.50848806  0.3186394 -0.3186394
+## 61 ESFJ  1.6906216 -2.3263479  0.13971030 -0.96742157 -1.1503494  1.1503494
+## 62 ESTP  0.6045853 -0.7478586  0.06968492 -0.86163412  0.8122178 -0.8122178
+## 63 ESFP  0.0000000 -0.1141853  0.06968492 -0.86163412 -0.2104284  0.2104284
+## 64 ENTP  0.9084579 -1.0968036 -0.50848806 -0.21042839  0.9674216 -0.9674216
+## 65 ESFP  0.9084579 -1.0968036 -0.06968492 -0.67448975 -0.8122178  0.8122178
+## 66 ISTJ -0.9084579  0.7478586  0.28221615 -1.22064035  0.1046335 -0.1046335
+## 67 INTJ -0.7478586  0.6045853 -0.67448975 -0.06968492  0.2104284 -0.2104284
+## 68 ENTP  0.9084579 -1.0968036 -1.08532491  0.21042839  0.6744898 -0.6744898
+## 69 ISTP -0.4727891  0.3487557  0.06968492 -0.86163412  0.3186394 -0.3186394
+## 70 INFP -0.2298841  0.1141853 -0.67448975 -0.06968492 -0.9674216  0.9674216
+## 71 ESFP  1.0968036 -1.3351777  0.21042839 -1.08532491  0.0000000  0.0000000
+## 72 ISFJ -0.7478586  0.6045853  0.00000000 -0.76470967  0.0000000  0.0000000
+## 73 ENTJ  0.6045853 -0.7478586 -0.35549042 -0.35549042  0.2104284 -0.2104284
+## 74 ESFJ  0.6045853 -0.7478586 -0.28221615 -0.43072730  0.0000000  0.0000000
+## 75 ESTJ  0.4727891 -0.6045853 -0.21042839 -0.50848806  0.6744898 -0.6744898
+## 76 ISFJ -1.0968036  0.9084579 -0.06968492 -0.67448975  0.0000000  0.0000000
+## 77 ESTP  0.6045853 -0.7478586 -0.28221615 -0.43072730  0.5485223 -0.5485223
+## 78 ISFP -0.7478586  0.6045853  0.00000000 -0.76470967 -0.1046335  0.1046335
+## 79 ESTJ  0.1141853 -0.2298841 -0.06968492 -0.67448975  0.1046335 -0.1046335
+## 80 ENFP  0.9084579 -1.0968036 -0.67448975 -0.06968492 -0.8122178  0.8122178
+## 81 INFP -1.0968036  0.9084579 -0.50848806 -0.21042839 -0.6744898  0.6744898
+## 82 ESFP  0.1141853 -0.2298841 -0.13971030 -0.58945580 -0.9674216  0.8122178
+## 83 INFP -0.3487557  0.2298841 -0.35549042 -0.35549042 -0.1046335  0.1046335
+## 84 ESFP  0.2298841 -0.3487557 -0.43072730 -0.28221615 -0.5485223  0.4307273
+## 85 ENTJ  0.9084579 -1.0968036 -0.67448975 -0.06968492 -0.6744898  0.6744898
+## 86 ENFP  1.3351777 -1.6906216 -0.86163412  0.06968492 -1.1503494  1.1503494
+## 87 ENTP  1.3351777 -1.6906216 -0.43072730 -0.28221615  0.6744898 -0.6744898
+## 88 ESFJ  0.0000000 -0.1141853  0.28221615 -0.28221615 -0.4307273  0.4307273
+## 89 ESFJ  0.7478586 -0.9084579 -0.28221615 -0.43072730 -0.5485223  0.5485223
+## 90 ISFP -0.2298841  0.1141853 -0.21042839 -0.50848806 -0.9674216  0.9674216
+## 91 ENFP  1.0968036 -1.3351777 -0.35549042 -0.35549042  0.0000000  0.0000000
+## 92 ENFJ  1.0968036 -1.3351777 -0.67448975 -0.06968492 -1.3829941  1.3829941
+## 93 ESTP  1.0968036 -1.3351777  0.28221615 -1.22064035  0.8122178 -0.8122178
+## 94 ESFJ  0.0000000 -0.1141853 -0.06968492 -0.67448975 -0.6744898  0.6744898
+## 95 ENFP  0.1141853 -0.2298841 -0.67448975 -0.06968492 -0.6744898  0.6744898
+## 96 ESFJ  0.0000000 -0.1141853  0.28221615 -0.28221615 -0.4307273  0.4307273
+## 97 ENFP  0.1141853 -0.2298841 -0.67448975 -0.06968492 -0.6744898  0.6744898
+##              J           P POSTURE HEIGHT_CM WEIGHT_KG      BMI MBTI_EI MBTI_SN
+## 1   0.78103381 -0.93881432       A    157.48  56.69900 22.86255       E       S
+## 2   0.16421078 -0.27592106       B    175.26  71.21394 23.18459       I       S
+## 3   0.05451891 -0.16421078       A    175.26  90.71840 29.53451       E       S
+## 4   0.93881432 -1.12433823       D    167.64  79.37860 28.24543       I       S
+## 5   0.51193621 -0.64066689       A    160.02  90.26481 35.25088       E       N
+## 6  -0.93881432  0.78103381       D    187.96  82.55374 23.36716       I       S
+## 7  -0.27592106  0.16421078       B    172.72 119.29470 39.98857       I       S
+## 8   0.64066689 -0.78103381       D    154.94  64.86366 27.01931       E       S
+## 9   0.16421078 -0.27592106       C    170.18  81.64656 28.19167       E       S
+## 10  0.64066689 -0.78103381       D    175.26  74.84268 24.36597       I       N
+## 11 -0.16421078  0.05451891       B    170.18  95.25432 32.89029       E       N
+## 12  0.05451891 -0.16421078       B    157.48  54.43104 21.94804       I       S
+## 13  0.27592106 -0.39119626       D    162.56  57.60618 21.79926       E       S
+## 14  0.64066689 -0.78103381       B    172.72  83.91452 28.12884       E       N
+## 15 -0.51193621  0.39119626       A    175.26  86.18248 28.05778       E       S
+## 16  0.93881432 -1.12433823       D    180.34  74.84268 23.01257       I       S
+## 17  1.12433823 -1.35973738       A    167.64  62.59570 22.27354       E       S
+## 18 -0.93881432  0.78103381       B    182.88  77.56423 23.19151       E       N
+## 19 -0.27592106  0.16421078       B    165.10  49.89512 18.30476       E       S
+## 20 -0.27592106  0.16421078       C    160.02  69.85317 27.27957       I       S
+## 21 -0.05451891 -0.05451891       D    167.64  83.91452 29.85945       I       N
+## 22 -0.39119626  0.27592106       B    175.26  79.83219 25.99037       E       S
+## 23 -0.51193621  0.39119626       B    172.72  70.76035 23.71946       E       S
+## 24  0.51193621 -0.64066689       D    154.94  63.50288 26.45248       E       S
+## 25  0.05451891 -0.16421078       C    152.40  53.52386 23.04504       I       N
+## 26  0.27592106 -0.27592106       C    165.10  60.32774 22.13211       I       S
+## 27 -0.51193621  0.39119626       A    172.72  74.84268 25.08789       E       S
+## 28 -0.64066689  0.51193621       D    157.48  51.25590 20.66774       I       S
+## 29  0.93881432 -1.12433823       D    165.10  68.03880 24.96103       E       N
+## 30 -2.32634787  1.71167531       A    160.02  79.37860 30.99952       E       N
+## 31 -1.35973738  1.12433823       A    167.64 100.69742 35.83134       E       S
+## 32  0.64066689 -0.78103381       D    175.26  68.94598 22.44623       E       S
+## 33 -1.12433823  0.93881432       B    170.18  61.23492 21.14375       E       S
+## 34  0.51193621 -0.64066689       C    185.42  90.71840 26.38653       E       N
+## 35 -0.93881432  0.78103381       D    157.48  86.18248 34.75107       I       S
+## 36  0.78103381 -0.93881432       C    160.02  64.41006 25.15389       I       S
+## 37  0.39119626 -0.51193621       C    172.72  77.11064 25.84813       E       N
+## 38 -1.35973738  1.12433823       A    167.64 100.69742 35.83134       E       N
+## 39 -0.64066689  0.51193621       B    160.02  70.30676 27.45671       E       S
+## 40  1.12433823 -1.35973738       B    175.26  86.18248 28.05778       E       N
+## 41 -0.05451891 -0.05451891       C    175.26  65.77084 21.41252       I       N
+## 42 -0.05451891 -0.05451891       D    177.80  72.57472 22.95736       I       S
+## 43 -1.35973738  1.12433823       A    152.40  72.12113 31.05221       E       S
+## 44 -1.71167531  1.35973738       A    154.94  62.59570 26.07458       E       N
+## 45 -1.12433823  0.93881432       A    149.86  52.16308 23.22693       E       N
+## 46  0.27592106 -0.39119626       D    167.64  83.46093 29.69805       I       S
+## 47 -0.93881432  0.78103381       D    157.48  68.03880 27.43505       I       S
+## 48  0.16421078 -0.27592106       B    157.48  57.60618 23.22835       E       N
+## 49 -0.16421078  0.05451891       B    172.72  70.30676 23.56741       E       S
+## 50  0.78103381 -0.93881432       B    167.64  68.03880 24.21037       I       N
+## 51 -0.16421078  0.05451891       C    157.48  58.96696 23.77705       E       S
+## 52 -0.93881432  0.64066689       B    162.56  74.84268 28.32187       E       N
+## 53 -0.78103381  0.64066689       A    165.10  78.01782 28.62198       E       S
+## 54  0.27592106 -0.39119626       D    172.72  51.25590 17.18140       I       N
+## 55  0.27592106 -0.39119626       B    160.02  58.05978 22.67393       E       S
+## 56  0.51193621 -0.64066689       B    154.94  68.03880 28.34194       E       S
+## 57 -0.64066689  0.51193621       B    172.72  65.77084 22.04693       E       S
+## 58 -0.93881432  0.78103381       B    177.80 113.39800 35.87087       E       S
+## 59  0.78103381 -0.93881432       C    157.48  72.57472 29.26406       I       S
+## 60 -0.27592106  0.16421078       B    162.56  83.00734 31.41153       I       S
+## 61  0.51193621 -0.64066689       B    160.02  75.29627 29.40525       E       S
+## 62 -0.51193621  0.39119626       A    170.18  72.57472 25.05927       E       S
+## 63 -0.78103381  0.64066689       B    157.48  53.52386 21.58224       E       S
+## 64 -0.27592106  0.16421078       C    157.48  90.71840 36.58007       E       N
+## 65 -0.64066689  0.51193621       A    177.80  77.11064 24.39219       E       S
+## 66  1.12433823 -1.35973738       B    157.48  49.89512 20.11904       I       S
+## 67  0.64066689 -0.78103381       C    185.42  70.30676 20.44956       I       N
+## 68 -0.51193621  0.39119626       B    177.80  90.71840 28.69669       E       N
+## 69 -1.12433823  0.93881432       C    172.72 100.69742 33.75461       I       S
+## 70 -1.35973738  1.12433823       D    152.40  47.62716 20.50618       I       N
+## 71 -0.39119626  0.27592106       A    170.18  61.23492 21.14375       E       S
+## 72  0.64066689 -0.78103381       C    170.18  67.13162 23.17982       I       S
+## 73  0.16421078 -0.27592106       B    165.10  72.57472 26.62510       E       N
+## 74  0.64066689 -0.78103381       C    185.42  77.11064 22.42855       E       S
+## 75  0.64066689 -0.78103381       B    180.34 104.32616 32.07813       E       S
+## 76  0.78103381 -0.93881432       A    170.18  72.57472 25.05927       I       S
+## 77 -0.05451891 -0.05451891       C    187.96 108.86208 30.81384       E       S
+## 78 -0.64066689  0.51193621       D    162.56  53.52386 20.25443       I       S
+## 79  0.51193621 -0.64066689       B    160.02  64.86366 25.33103       E       S
+## 80 -0.05451891 -0.05451891       B    167.64  90.71840 32.28049       E       N
+## 81 -0.93881432  0.78103381       C    180.34  65.77084 20.22317       I       N
+## 82 -0.27592106  0.16421078       C    162.56  70.30676 26.60539       E       S
+## 83 -0.78103381  0.64066689       D    147.32  36.74095 16.92883       I       N
+## 84 -0.78103381  0.64066689       B    152.40  39.91610 17.18613       E       S
+## 85  0.05451891 -0.16421078       D    172.72  56.69900 19.00597       E       N
+## 86 -2.32634787  1.71167531       A    152.40  30.84426 13.28019       E       N
+## 87 -1.35973738  1.12433823       A    165.10  89.81122 32.94856       E       N
+## 88  0.27592106 -0.39119626       B    170.18  81.64656 28.19167       E       S
+## 89  0.39119626 -0.51193621       B    165.10  87.54326 32.11653       E       S
+## 90 -0.78103381  0.64066689       C    170.18  68.03880 23.49306       I       S
+## 91 -0.16421078  0.05451891       A    165.10  56.69900 20.80086       E       N
+## 92  0.05451891 -0.16421078       B    175.26  58.96696 19.19743       E       N
+## 93 -1.35973738  1.12433823       B    147.32  45.35920 20.89979       E       S
+## 94  0.16421078 -0.27592106       B    157.48  60.78133 24.50865       E       S
+## 95 -1.35973738  1.12433823       A    175.26  85.27530 27.76244       E       N
+## 96  0.27592106 -0.39119626       B    170.18  81.64656 28.19167       E       S
+## 97 -1.35973738  1.12433823       A    175.26  85.27530 27.76244       E       N
+##    MBTI_TF MBTI_JP SEX_INT ACTIVITY.LEVEL_INT POSTURE_INT MBTI_GROUP
+## 1        F       J       1                  1           1   Sentinel
+## 2        T       J       2                  3           2   Sentinel
+## 3        T       J       2                  3           1   Sentinel
+## 4        T       J       2                  2           4   Sentinel
+## 5        F       J       1                  2           1   Diplomat
+## 6        F       P       2                  1           4   Explorer
+## 7        T       P       2                  1           2   Explorer
+## 8        T       J       1                  1           4   Sentinel
+## 9        F       J       2                  1           3   Sentinel
+## 10       F       J       2                  1           4   Diplomat
+## 11       T       P       2                  1           2    Analyst
+## 12       F       J       1                  1           2   Sentinel
+## 13       F       J       1                  1           4   Sentinel
+## 14       T       J       2                  1           2    Analyst
+## 15       T       P       2                  2           1   Explorer
+## 16       T       J       2                  1           4   Sentinel
+## 17       T       J       1                  1           1   Sentinel
+## 18       F       P       2                  2           2   Diplomat
+## 19       F       P       1                  1           2   Explorer
+## 20       F       P       1                  1           3   Explorer
+## 21       F       P       1                  1           4   Diplomat
+## 22       T       P       2                  1           2   Explorer
+## 23       T       P       1                  1           2   Explorer
+## 24       F       J       1                  1           4   Sentinel
+## 25       F       J       1                  2           3   Diplomat
+## 26       F       J       1                  1           3   Sentinel
+## 27       T       P       2                  3           1   Explorer
+## 28       T       P       1                  1           4   Explorer
+## 29       T       J       2                  1           4    Analyst
+## 30       F       P       2                  2           1   Diplomat
+## 31       F       P       2                  1           1   Explorer
+## 32       T       J       2                  1           4   Sentinel
+## 33       T       P       2                  1           2   Explorer
+## 34       T       J       2                  1           3    Analyst
+## 35       F       P       1                  1           4   Explorer
+## 36       T       J       1                  1           3   Sentinel
+## 37       F       J       2                  3           3   Diplomat
+## 38       F       P       2                  1           1   Diplomat
+## 39       T       P       2                  1           2   Explorer
+## 40       F       J       2                  1           2   Diplomat
+## 41       F       P       2                  2           3   Diplomat
+## 42       F       P       2                  1           4   Explorer
+## 43       F       P       2                  1           1   Explorer
+## 44       F       P       1                  1           1   Diplomat
+## 45       F       P       1                  1           1   Diplomat
+## 46       T       J       2                  1           4   Sentinel
+## 47       F       P       1                  1           4   Explorer
+## 48       F       J       1                  1           2   Diplomat
+## 49       T       P       2                  1           2   Explorer
+## 50       F       J       1                  1           2   Diplomat
+## 51       F       P       1                  1           3   Explorer
+## 52       T       P       2                  1           2    Analyst
+## 53       F       P       1                  1           1   Explorer
+## 54       F       J       1                  1           4   Diplomat
+## 55       F       J       1                  1           2   Sentinel
+## 56       T       J       1                  1           2   Sentinel
+## 57       F       P       1                  2           2   Explorer
+## 58       F       P       2                  1           2   Explorer
+## 59       F       J       1                  1           3   Sentinel
+## 60       T       P       2                  1           2   Explorer
+## 61       F       J       1                  1           2   Sentinel
+## 62       T       P       2                  1           1   Explorer
+## 63       F       P       1                  1           2   Explorer
+## 64       T       P       2                  1           3    Analyst
+## 65       F       P       2                  1           1   Explorer
+## 66       T       J       1                  1           2   Sentinel
+## 67       T       J       2                  3           3    Analyst
+## 68       T       P       2                  2           2    Analyst
+## 69       T       P       2                  1           3   Explorer
+## 70       F       P       1                  1           4   Diplomat
+## 71       F       P       1                  1           1   Explorer
+## 72       F       J       2                  1           3   Sentinel
+## 73       T       J       1                  1           2    Analyst
+## 74       F       J       2                  1           3   Sentinel
+## 75       T       J       2                  2           2   Sentinel
+## 76       F       J       1                  1           1   Sentinel
+## 77       T       P       2                  1           3   Explorer
+## 78       F       P       1                  2           4   Explorer
+## 79       T       J       1                  1           2   Sentinel
+## 80       F       P       1                  1           2   Diplomat
+## 81       F       P       2                  1           3   Diplomat
+## 82       F       P       1                  1           3   Explorer
+## 83       F       P       1                  1           4   Diplomat
+## 84       F       P       1                  1           2   Explorer
+## 85       T       J       1                  1           4    Analyst
+## 86       F       P       2                  3           1   Diplomat
+## 87       T       P       2                  1           1    Analyst
+## 88       F       J       1                  1           2   Sentinel
+## 89       F       J       1                  1           2   Sentinel
+## 90       F       P       1                  1           3   Explorer
+## 91       F       P       1                  2           1   Diplomat
+## 92       F       J       1                  2           2   Diplomat
+## 93       T       P       2                  2           2   Explorer
+## 94       F       J       1                  2           2   Sentinel
+## 95       F       P       2                  2           1   Diplomat
+## 96       F       J       1                  1           2   Sentinel
+## 97       F       P       2                  2           1   Diplomat</code></pre>
 <pre class="r"><code>plot(dataset_mbti$E, dataset_mbti$I)</code></pre>
 <p><img src="data:image/png;base64,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" width="672" /></p>
 <pre class="r"><code>plot(dataset_mbti$S, dataset_mbti$N)</code></pre>
@@ -1650,7 +2058,7 @@ dataset_mbti$POSTURE_INT &lt;- match(dataset_mbti$POSTURE, c(&quot;A&quot;, &quo
 <ol style="list-style-type: decimal">
 <li><p>Is there a connection between personality type and
 posture?</p></li>
-<li><p>Are physically attractive people also more extraverted?</p></li>
+<li><p>Are physically active people also more extroverted?</p></li>
 <li><p>Is there a difference in height/weight based on personality
 type?</p></li>
 <li><p>Can you predict a personality type or a specific personality
@@ -1666,6 +2074,7 @@ types?</p></li>
 posture?</h1>
 <p><em>[HR]</em> Postoji li veza izmedu tipa ličnosti i načina
 držanja?</p>
+<p>kategorije sa 16personalities.com</p>
 <pre class="r"><code>table(
   dataset_mbti$POSTURE,
   dataset_mbti$MBTI
@@ -1721,14 +2130,66 @@ držanja?</p>
 <p>There is a significant …</p>
 </div>
 </div>
-<div id="rq-2-are-physically-attractive-people-also-more-extraverted" class="section level1">
-<h1>RQ-2: Are physically attractive people also more extraverted?</h1>
+<div id="rq-2-are-physically-active-people-also-more-extroverted" class="section level1">
+<h1>RQ-2: Are physically active people also more extroverted?</h1>
 <p><em>[HR]</em> Jesu li fizički aktivniji ljudi također i
 ekstrovertiraniji?</p>
-<p>Conduct independency test</p>
+<pre class="r"><code>boxplot(dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == &quot;Low&quot;,]$E, 
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == &quot;Moderate&quot;,]$E,
+        dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == &quot;High&quot;,]$E,
+        names = c(&quot;Low&quot;, &quot;Moderate&quot;, &quot;High&quot;),
+        main = &quot;Extraversion per activity level&quot;)</code></pre>
+<p><img src="data:image/png;base64,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" width="672" /></p>
+<p>ANOVA</p>
+<p>H0: There is no significant difference in mean extraversion scores
+among people with different activity levels (Low, Moderate, High).</p>
+<p>H1: At least one pair of activity levels has significantly different
+mean extraversion scores.</p>
+<pre class="r"><code>extraversion_scores &lt;- dataset_mbti$E[dataset_mbti$MBTI_EI == &quot;E&quot;]
+
+low_activity &lt;- dataset_mbti$E[dataset_mbti$ACTIVITY.LEVEL == &quot;Low&quot;]
+moderate_activity &lt;- dataset_mbti$E[dataset_mbti$ACTIVITY.LEVEL == &quot;Moderate&quot;]
+high_activity &lt;- dataset_mbti$E[dataset_mbti$ACTIVITY.LEVEL == &quot;High&quot;]
+
+anova_result &lt;- aov(E ~ ACTIVITY.LEVEL, data = dataset_mbti)
+
+summary(anova_result)</code></pre>
+<pre><code>##                Df Sum Sq Mean Sq F value Pr(&gt;F)
+## ACTIVITY.LEVEL  2   0.76  0.3811   0.592  0.555
+## Residuals      94  60.53  0.6439</code></pre>
+<p>p-value = 0.555 &gt; significance level = 0.05</p>
+<p>We cannot reject null hypothesis. There isn’t enough evidence to
+conclude that there are significant differences in extraversion scores
+among individuals with different activity levels.</p>
+<p>Independency</p>
+<p>H0: Activity levels and extraversion are independent of each
+other.</p>
+<p>H1: Activity levels and extraversion are not independent of each
+other, there is a relationship between them.</p>
+<pre class="r"><code>contingency_table &lt;- table(dataset_mbti$ACTIVITY.LEVEL, dataset_mbti$MBTI_EI)
+contingency_table</code></pre>
+<pre><code>##           
+##             E  I
+##   High      4  2
+##   Low      48 26
+##   Moderate 13  4</code></pre>
+<pre class="r"><code>chi_sq_test &lt;- chisq.test(contingency_table)</code></pre>
+<pre><code>## Warning in chisq.test(contingency_table): Chi-squared approximation may be
+## incorrect</code></pre>
+<pre class="r"><code>print(chi_sq_test)</code></pre>
+<pre><code>## 
+##  Pearson&#39;s Chi-squared test
+## 
+## data:  contingency_table
+## X-squared = 0.84264, df = 2, p-value = 0.6562</code></pre>
+<p>p-value = 0.6562 &gt; significance level = 0.05</p>
+<p>We cannot reject null hypothesis. There isn’t enough evidence to
+conclude that extraversion and different activity levels are not
+independant.</p>
 <div id="conclusion-1" class="section level2">
 <h2>Conclusion</h2>
-<p>Physically attractive people are/aren’t also more extraverted.</p>
+<p>There is not enough evidence to say that physically active people are
+also more extroverted.</p>
 </div>
 </div>
 <div id="rq-3-is-there-a-difference-in-heightweight-based-on-personality-type" class="section level1">
@@ -1884,30 +2345,35 @@ ili rezultat na pojedinoj karakteristici?</p>
         names = c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;),
         main = &quot;Judging per posture&quot;)</code></pre>
 <p><img src="data:image/png;base64,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9xW5gK4xvUHD9eNy9IA++L2bXw32TYjfiSSgqxx/zzLcb4V++C38YN/BzX4v/HC/E+fB74Uf7Pz3BHSF4+9Zrh6n0S7Q2L+IdP0yrvs/jenlYF+APvzTmMb7AlRA1zj+lm3/LexgN2gS0B/HexnTzS8ivr//yzwuvv1kvD9R2Z8HKqBrzH/30XDfws1fSD/Y9Fd++vjoN7MONv/8T6QfsJ8CusLr2Vecw72OZ/6X4gzWj72Lr+/nH/3vRBrtz0I4ENCwh7/q/NVo38Qd/bWMf+y9mz7+8Y2/lfNq/N8MevwCChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEH/H/vR6GTYidJBAAAAAElFTkSuQmCC" width="672" /></p>
-<p>Use fastDummies for posture, beware of co-linear columns</p>
+<p>Use fastDummies for posture and MBTI gruops, beware of co-linear
+columns</p>
 <p>Based on regression coefficients, calculate the expected value for
 certain physical trait</p>
-<pre class="r"><code>summary(lm(E ~ POSTURE_INT + PAIN.1 + PAIN.4, dataset_mbti))</code></pre>
+<pre class="r"><code>summary(lm(E ~ POSTURE_INT + PAIN.1 + PAIN.4 + HEIGHT_CM + WEIGHT_KG + F, dataset_mbti))</code></pre>
 <pre><code>## 
 ## Call:
-## lm(formula = E ~ POSTURE_INT + PAIN.1 + PAIN.4, data = dataset_mbti)
+## lm(formula = E ~ POSTURE_INT + PAIN.1 + PAIN.4 + HEIGHT_CM + 
+##     WEIGHT_KG + F, data = dataset_mbti)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
-## -1.73259 -0.46276  0.04387  0.48089  1.68436 
+## -1.81297 -0.41801  0.02101  0.44904  1.83507 
 ## 
 ## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  1.17972    0.17618   6.696 1.60e-09 ***
-## POSTURE_INT -0.39115    0.06313  -6.196 1.56e-08 ***
-## PAIN.1      -0.09010    0.02715  -3.319  0.00129 ** 
-## PAIN.4       0.07283    0.02248   3.239  0.00166 ** 
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  1.941070   1.340775   1.448 0.151169    
+## POSTURE_INT -0.387763   0.065694  -5.903 6.23e-08 ***
+## PAIN.1      -0.095126   0.027608  -3.446 0.000868 ***
+## PAIN.4       0.076014   0.024105   3.153 0.002194 ** 
+## HEIGHT_CM   -0.004014   0.009010  -0.445 0.657033    
+## WEIGHT_KG   -0.001609   0.005311  -0.303 0.762589    
+## F            0.100323   0.101536   0.988 0.325773    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 0.6509 on 93 degrees of freedom
-## Multiple R-squared:  0.3571, Adjusted R-squared:  0.3364 
-## F-statistic: 17.22 on 3 and 93 DF,  p-value: 5.65e-09</code></pre>
+## Residual standard error: 0.6535 on 90 degrees of freedom
+## Multiple R-squared:  0.3728, Adjusted R-squared:  0.331 
+## F-statistic: 8.917 on 6 and 90 DF,  p-value: 1.232e-07</code></pre>
 <pre class="r"><code>summary(lm(J ~ POSTURE_INT, dataset_mbti))</code></pre>
 <pre><code>## 
 ## Call:

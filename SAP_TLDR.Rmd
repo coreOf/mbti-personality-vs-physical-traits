@@ -1,7 +1,7 @@
 ---
 title: "Relationship between MBTI personality types and physical traits"
 author: "Tina Bakić, Luka Korov, Dora Baričević, Roko Grbelja"
-date: "Dec 14, 2023"
+date: "`r Sys.Date()`"
 output:
   html_document:
     theme: darkly
@@ -15,7 +15,7 @@ subtitle: "Project task for Statistical Data Analysis course at University of Za
 
 ## Libraries
 
-```{r}
+```{r message=FALSE, warnings=FALSE}
 library(hexbin)
 library(dplyr)
 ```
@@ -171,15 +171,51 @@ boxplot(dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Low",]$E,
 
 ANOVA
 
-Independency
+H0: There is no significant difference in mean extraversion scores among people with different activity levels (Low, Moderate, High).
+
+H1: At least one pair of activity levels has significantly different mean extraversion scores.
+
 
 ```{r}
-table(dataset_mbti$ACTIVITY.LEVEL, dataset_mbti$MBTI_EI)
+extraversion_scores <- dataset_mbti$E[dataset_mbti$MBTI_EI == "E"]
+
+low_activity <- dataset_mbti$E[dataset_mbti$ACTIVITY.LEVEL == "Low"]
+moderate_activity <- dataset_mbti$E[dataset_mbti$ACTIVITY.LEVEL == "Moderate"]
+high_activity <- dataset_mbti$E[dataset_mbti$ACTIVITY.LEVEL == "High"]
+
+anova_result <- aov(E ~ ACTIVITY.LEVEL, data = dataset_mbti)
+
+summary(anova_result)
 ```
+
+p-value = 0.555 > significance level = 0.05
+
+We cannot reject null hypothesis. There isn't enough evidence to conclude that there are significant differences in extraversion scores among individuals with different activity levels.
+
+
+Independency
+
+H0: Activity levels and extraversion are independent of each other.
+
+H1: Activity levels and extraversion are not independent of each other, there is a relationship between them.
+
+```{r}
+contingency_table <- table(dataset_mbti$ACTIVITY.LEVEL, dataset_mbti$MBTI_EI)
+contingency_table
+```
+
+```{r}
+chi_sq_test <- chisq.test(contingency_table)
+print(chi_sq_test)
+```
+
+p-value = 0.6562 > significance level = 0.05
+
+We cannot reject null hypothesis. There isn't enough evidence to conclude that extraversion and different activity levels are not independant.
 
 ## Conclusion
 
-Physically active people are/aren't also more extroverted.
+There is not enough evidence to say that physically active people are also more extroverted.
 
 # RQ-3: Is there a difference in height/weight based on personality type?
 
