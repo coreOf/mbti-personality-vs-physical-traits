@@ -368,6 +368,51 @@ Logistic regression for categories
 
 Based on posture/height/weight/something we can predict a personality characteristic...
 
+# RQ-5: Are women more feeling than men?
+
+*[HR]* Jesu li žene osjećajnije nego muškarci?
+
+Independency
+
+H0: There is no difference in the distribution of the Feeling variable between men and women.
+
+H1: There is a difference in the distribution of the Feeling variable between men and women.
+
+```{r}
+contingency_table <- table(dataset_mbti$SEX, dataset_mbti$MBTI_TF)
+contingency_table
+```
+
+```{r}
+chi_sq_test <- chisq.test(contingency_table)
+print(chi_sq_test)
+```
+p-value = 0.0002972 > significance level = 0.05
+
+We can reject null hypothesis. There is a significant difference in the distribution of the Feeling variable between men and women.
+
+Test of proportions
+
+H0: The proportion of individuals classified as Feeling is the same for men and women.
+
+H1: The proportion of individuals classified as Feeling is higher for women compared to men.
+
+```{r}
+feeling_counts <- contingency_table["Female", "F"]
+total_counts <- rowSums(contingency_table)
+
+proportion_test <- prop.test(feeling_counts, total_counts["Female"])
+proportion_test
+```
+p-value = 6.334e-05 < significance level = 0.05 
+We can reject null hypothesis.
+
+The confidence interval, ranging from 0.6523763 to 0.8927585, gives us a likely range for the true proportion of individuals labeled as "Feeling" in the entire population. The sample estimate p is 0.7959184 and it suggests that in our sample, a substantial proportion of females are classified as "Feeling." If there was no difference, the expected proportion would be 0.5. In simpler terms, this indicates that in our sample a larger number of females are likely to be classified as "Feeling" rather than not.
+
+## Conclusion
+
+Women are more feeling than men.
+
 # Discussion
 
 # Resources
