@@ -55,7 +55,7 @@ cat(tabl)
 ```
 
 ```{r}
-dataset_mbti = read.csv("datasets/MBTI.csv")
+dataset_mbti <- read.csv("datasets/MBTI.csv")
 ```
 
 ### Transformations
@@ -65,7 +65,7 @@ dataset_mbti = read.csv("datasets/MBTI.csv")
 ```{r}
 dataset_mbti$HEIGHT_CM <- dataset_mbti$HEIGHT * 2.54
 dataset_mbti$WEIGHT_KG <- dataset_mbti$WEIGHT * 0.453592
-dataset_mbti$BMI <- dataset_mbti$WEIGHT_KG / (dataset_mbti$HEIGHT_CM/100)^2
+dataset_mbti$BMI <- dataset_mbti$WEIGHT_KG / (dataset_mbti$HEIGHT_CM / 100)^2
 ```
 
 2.  separating each personality trait
@@ -89,12 +89,12 @@ dataset_mbti$POSTURE_INT <- match(dataset_mbti$POSTURE, c("A", "B", "C", "D"))
 
 ```{r}
 dataset_mbti %>%
-  mutate(MBTI_GROUP = case_when(
-    MBTI == "INTJ" | MBTI == "INTP" | MBTI == "ENTJ" | MBTI == "ENTP" ~ "Analyst",
-    MBTI == "INFJ" | MBTI == "INFP" | MBTI == "ENFJ" | MBTI == "ENFP" ~ "Diplomat",
-    MBTI == "ISTJ" | MBTI == "ISFJ" | MBTI == "ESTJ" | MBTI == "ESFJ" ~ "Sentinel",
-    MBTI == "ISTP" | MBTI == "ISFP" | MBTI == "ESTP" | MBTI == "ESFP" ~ "Explorer"
-    ))
+        mutate(MBTI_GROUP = case_when(
+                MBTI == "INTJ" | MBTI == "INTP" | MBTI == "ENTJ" | MBTI == "ENTP" ~ "Analyst",
+                MBTI == "INFJ" | MBTI == "INFP" | MBTI == "ENFJ" | MBTI == "ENFP" ~ "Diplomat",
+                MBTI == "ISTJ" | MBTI == "ISFJ" | MBTI == "ESTJ" | MBTI == "ESFJ" ~ "Sentinel",
+                MBTI == "ISTP" | MBTI == "ISFP" | MBTI == "ESTP" | MBTI == "ESFP" ~ "Explorer"
+        ))
 ```
 
 ```{r}
@@ -124,38 +124,97 @@ plot(dataset_mbti$J, dataset_mbti$P)
 
 kategorije sa 16personalities.com
 
+## For MBTI Personality Type:
+
+**H0:** There is no association between the individual personality trait and posture.
+
+**H1:** There is an association between the individual personality trait and posture.
+
 ```{r}
-table(
-  dataset_mbti$POSTURE,
-  dataset_mbti$MBTI
-  )
+mbti_posture_table <- table(dataset_mbti$POSTURE, dataset_mbti$MBTI)
+mbti_posture_table
 
-table(
-  dataset_mbti$POSTURE,
-  dataset_mbti$MBTI_EI
-  )
-
-
-table(
-  dataset_mbti$POSTURE,
-  dataset_mbti$MBTI_SN
-  )
-
-table(
-  dataset_mbti$POSTURE,
-  dataset_mbti$MBTI_TF
-  )
-
-
-table(
-  dataset_mbti$POSTURE,
-  dataset_mbti$MBTI_JP
-  )
+chi_squared_test_mbti <- chisq.test(mbti_posture_table)
+chi_squared_test_mbti
 ```
 
-## Conclusion
+p-value = 0.001072 \< significance-level = 0.05
 
-There is a significant ...
+### Conclusion
+
+The p-value of the Chi-squared test is lower than the significance level, therefore, we reject the
+null hypothesis and conclude that there is a significant correlation between an individual's
+personality type and their posture. It is important to note that the Chi-squared approximation may
+not be correct as our sample size is relatively small and our contingency table is large and data is
+sparse. We can try and remedy this by aggregating the posture types into two categories: GOOD and
+BAD.
+
+```{r}
+dataset_mbti$POSTURE_AGG <- ifelse(dataset_mbti$POSTURE == "A", "GOOD", "BAD")
+table(dataset_mbti$POSTURE_AGG)
+```
+
+```{r}
+mbti_posture_agg_table <- table(dataset_mbti$POSTURE_AGG, dataset_mbti$MBTI)
+
+chi_squared_test_mbti_agg <- chisq.test(mbti_posture_agg_table)
+
+chi_squared_test_mbti_agg
+
+```
+
+## For individual personality traits:
+
+**H0:** There is no association between the individual personality trait and posture.
+
+**H1:** There is an association between the individual personality trait and posture.
+
+```{r}
+ei_posture_table <- table(dataset_mbti$POSTURE, dataset_mbti$MBTI_EI)
+sn_posture_table <- table(dataset_mbti$POSTURE, dataset_mbti$MBTI_SN)
+tf_posture_table <- table(dataset_mbti$POSTURE, dataset_mbti$MBTI_TF)
+jp_posture_table <- table(dataset_mbti$POSTURE, dataset_mbti$MBTI_JP)
+```
+
+```{r}
+chi_squared_test_ei <- chisq.test(ei_posture_table)
+chi_squared_test_ei
+```
+
+```{r}
+chi_squared_test_sn <- chisq.test(sn_posture_table)
+chi_squared_test_sn
+```
+
+```{r}
+chi_squared_test_tf <- chisq.test(tf_posture_table)
+chi_squared_test_tf
+```
+
+```{r}
+chi_squared_test_jp <- chisq.test(jp_posture_table)
+chi_squared_test_jp
+```
+
+### Conclusion
+
+Out of the 4 personality traits, only the extroversion/introversion trait passes the chi-squared
+test on the significance level of 0.05. We reject the null hypothesis for the
+extroversion/introversion personality trait and conclude that there is a significant connection
+between an individual's extrovertedness and their posture.
+
+If we try and visualize the extroversion scores for each posture type, it is apparent that
+extroverted individuals tend to have better posture.
+
+```{r}
+boxplot(dataset_mbti[dataset_mbti$POSTURE == "A", ]$E,
+        dataset_mbti[dataset_mbti$POSTURE == "B", ]$E,
+        dataset_mbti[dataset_mbti$POSTURE == "C", ]$E,
+        dataset_mbti[dataset_mbti$POSTURE == "D", ]$E,
+        names = c("Ideal", "Kyphosis-lordosis", "Flat back", "Sway-back"),
+        main = "Extroversion per posture type"
+)
+```
 
 # RQ-2: Are physically active people also more extroverted?
 
