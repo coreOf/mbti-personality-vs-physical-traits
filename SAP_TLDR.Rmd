@@ -314,13 +314,33 @@ Variant equality check
 var.test(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$WEIGHT_KG, dataset_mbti[dataset_mbti$MBTI_EI == "I",]$WEIGHT_KG)
 ```
 
+
+ANOVA
+
+H0: There is no significant difference in mean weight value for different personality type.
+
+H1: At least one pair of personality types has significantly different mean than the weight mean.
+
+
+```{r}
+summary(lm(WEIGHT_KG ~ MBTI, data = dataset_mbti))
+```
+```{r}
+anova(lm(WEIGHT_KG ~ MBTI, data = dataset_mbti))
+```
+$p = 0.4012 > \alpha = 0.05$
+
+We cannot reject H0.
+
 T-test with equal/different variants
 
 ```{r}
 t.test(dataset_mbti[dataset_mbti$MBTI_EI == "E",]$WEIGHT_KG, dataset_mbti[dataset_mbti$MBTI_EI == "I",]$WEIGHT_KG, alt = "greater", var.equal = TRUE)
 ```
+p-value = 0.1164 > 0.05, it confirms that we cannot reject H0.
 
 ## Conclusion
+There is not enough evidence to claim that there is a difference in weight based on personality type.
 
 # RQ-4: Can you predict a personality type or a specific personality characteristic based on physical traits?
 
