@@ -8,6 +8,9 @@ output:
     toc: yes
     toc_float:
       collapsed: true
+  pdf_document:
+    toc: true
+    number_sections: true
 subtitle: "Project task for Statistical Data Analysis course at University of Zagreb, Faculty of Electrical Engineering and Computing"
 ---
 
@@ -116,19 +119,15 @@ plot(dataset_mbti$J, dataset_mbti$P)
 
 5.  Are women more feeling than men?
 
-6.  Is there a connection between generation (age) and personality types?
-
 # RQ-1: Is there a connection between personality type and posture?
 
 *[HR]* Postoji li veza izmedu tipa ličnosti i načina držanja?
 
-kategorije sa 16personalities.com
-
 ## For MBTI Personality Type:
 
-**H0:** There is no association between the individual personality trait and posture.
+$H_0:$ There is no association between the individual personality trait and posture.
 
-**H1:** There is an association between the individual personality trait and posture.
+$H_1:$ There is an association between the individual personality trait and posture.
 
 ```{r}
 mbti_posture_table <- table(dataset_mbti$POSTURE, dataset_mbti$MBTI)
@@ -138,16 +137,11 @@ chi_squared_test_mbti <- chisq.test(mbti_posture_table)
 chi_squared_test_mbti
 ```
 
-p-value = 0.001072 \< significance-level = 0.05
+$p = 0.001072 < \alpha = 0.05$
 
 ### Conclusion
 
-The p-value of the Chi-squared test is lower than the significance level, therefore, we reject the
-null hypothesis and conclude that there is a significant correlation between an individual's
-personality type and their posture. It is important to note that the Chi-squared approximation may
-not be correct as our sample size is relatively small and our contingency table is large and data is
-sparse. We can try and remedy this by aggregating the posture types into two categories: GOOD and
-BAD.
+The p-value of the Chi-squared test is lower than the significance level, therefore, we reject the null hypothesis and conclude that there is a significant correlation between an individual's personality type and their posture. It is important to note that the Chi-squared approximation may not be correct as our sample size is relatively small and our contingency table is large and data is sparse. We can try and remedy this by aggregating the posture types into two categories: GOOD and BAD.
 
 ```{r}
 dataset_mbti$POSTURE_AGG <- ifelse(dataset_mbti$POSTURE == "A", "GOOD", "BAD")
@@ -165,9 +159,9 @@ chi_squared_test_mbti_agg
 
 ## For individual personality traits:
 
-**H0:** There is no association between the individual personality trait and posture.
+$H_0:$ There is no association between the individual personality trait and posture.
 
-**H1:** There is an association between the individual personality trait and posture.
+$H_1:$ There is an association between the individual personality trait and posture.
 
 ```{r}
 ei_posture_table <- table(dataset_mbti$POSTURE, dataset_mbti$MBTI_EI)
@@ -198,13 +192,9 @@ chi_squared_test_jp
 
 ### Conclusion
 
-Out of the 4 personality traits, only the extroversion/introversion trait passes the chi-squared
-test on the significance level of 0.05. We reject the null hypothesis for the
-extroversion/introversion personality trait and conclude that there is a significant connection
-between an individual's extrovertedness and their posture.
+Out of the 4 personality traits, only the extroversion/introversion trait passes the chi-squared test on the significance level of $0.05$. We reject the null hypothesis for the extroversion/introversion personality trait and conclude that there is a significant connection between an individual's extrovertedness and their posture.
 
-If we try and visualize the extroversion scores for each posture type, it is apparent that
-extroverted individuals tend to have better posture.
+If we try and visualize the extroversion scores for each posture type, it is apparent that extroverted individuals tend to have better posture.
 
 ```{r}
 boxplot(dataset_mbti[dataset_mbti$POSTURE == "A", ]$E,
@@ -228,12 +218,11 @@ boxplot(dataset_mbti[dataset_mbti$ACTIVITY.LEVEL == "Low",]$E,
         main = "Extraversion per activity level")
 ```
 
-ANOVA
+## ANOVA
 
-H0: There is no significant difference in mean extraversion scores among people with different activity levels (Low, Moderate, High).
+$H_0:$ There is no significant difference in mean extraversion scores among people with different activity levels (Low, Moderate, High).
 
-H1: At least one pair of activity levels has significantly different mean extraversion scores.
-
+$H_1:$ At least one pair of activity levels has significantly different mean extraversion scores.
 
 ```{r}
 extraversion_scores <- dataset_mbti$E[dataset_mbti$MBTI_EI == "E"]
@@ -247,16 +236,15 @@ anova_result <- aov(E ~ ACTIVITY.LEVEL, data = dataset_mbti)
 summary(anova_result)
 ```
 
-p-value = 0.555 > significance level = 0.05
+$p = 0.555 > \alpha = 0.05$
 
 We cannot reject null hypothesis. There isn't enough evidence to conclude that there are significant differences in extraversion scores among individuals with different activity levels.
 
+## Independency
 
-Independency
+$H_0:$ Activity levels and extraversion are independent of each other.
 
-H0: Activity levels and extraversion are independent of each other.
-
-H1: Activity levels and extraversion are not independent of each other, there is a relationship between them.
+$H_1:$ Activity levels and extraversion are not independent of each other, there is a relationship between them.
 
 ```{r}
 contingency_table <- table(dataset_mbti$ACTIVITY.LEVEL, dataset_mbti$MBTI_EI)
@@ -268,7 +256,7 @@ chi_sq_test <- chisq.test(contingency_table)
 print(chi_sq_test)
 ```
 
-p-value = 0.6562 > significance level = 0.05
+$p = 0.6562 > \alpha = 0.05$
 
 We cannot reject null hypothesis. There isn't enough evidence to conclude that extraversion and different activity levels are not independant.
 
@@ -431,11 +419,11 @@ Based on posture/height/weight/something we can predict a personality characteri
 
 *[HR]* Jesu li žene osjećajnije nego muškarci?
 
-Independency
+## Independency
 
-H0: There is no difference in the distribution of the Feeling variable between men and women.
+$H_0:$ There is no difference in the distribution of the Feeling variable between men and women.
 
-H1: There is a difference in the distribution of the Feeling variable between men and women.
+$H_1:$ There is a difference in the distribution of the Feeling variable between men and women.
 
 ```{r}
 contingency_table <- table(dataset_mbti$SEX, dataset_mbti$MBTI_TF)
@@ -446,15 +434,16 @@ contingency_table
 chi_sq_test <- chisq.test(contingency_table)
 print(chi_sq_test)
 ```
-p-value = 0.0002972 > significance level = 0.05
+
+$p = 0.0002972 > \alpha = 0.05$
 
 We can reject null hypothesis. There is a significant difference in the distribution of the Feeling variable between men and women.
 
-Test of proportions
+## Test of proportions
 
-H0: The proportion of individuals classified as Feeling is the same for men and women.
+$H_0:$ The proportion of individuals classified as Feeling is the same for men and women.
 
-H1: The proportion of individuals classified as Feeling is higher for women compared to men.
+$H_1:$ The proportion of individuals classified as Feeling is higher for women compared to men.
 
 ```{r}
 feeling_counts <- contingency_table["Female", "F"]
@@ -463,16 +452,16 @@ total_counts <- rowSums(contingency_table)
 proportion_test <- prop.test(feeling_counts, total_counts["Female"])
 proportion_test
 ```
-p-value = 6.334e-05 < significance level = 0.05 
+
+$p = 6.334e-05 < \alpha = 0.05$
+
 We can reject null hypothesis.
 
-The confidence interval, ranging from 0.6523763 to 0.8927585, gives us a likely range for the true proportion of individuals labeled as "Feeling" in the entire population. The sample estimate p is 0.7959184 and it suggests that in our sample, a substantial proportion of females are classified as "Feeling." If there was no difference, the expected proportion would be 0.5. In simpler terms, this indicates that in our sample a larger number of females are likely to be classified as "Feeling" rather than not.
+The confidence interval, ranging from $0.6523763$ to $0.8927585$, gives us a likely range for the true proportion of individuals labeled as "Feeling" in the entire population. The sample estimate $p$ is $0.7959184$ and it suggests that in our sample, a substantial proportion of females are classified as "Feeling." If there was no difference, the expected proportion would be $0.5$. In simpler terms, this indicates that in our sample a larger number of females are likely to be classified as "Feeling" rather than not.
 
 ## Conclusion
 
 Women are more feeling than men.
-
-# Discussion
 
 # Resources
 
